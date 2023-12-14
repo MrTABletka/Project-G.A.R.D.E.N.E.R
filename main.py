@@ -60,6 +60,8 @@ class Player(pygame.sprite.Sprite):
         speedy = 10
         target_x = x - self.rect.x
         target_y = y - self.rect.y
+        if not target_y:
+            target_y = 1
         target_xdely = target_x / target_y
         if target_y < 0:
             if target_xdely > 0.34 and target_xdely < 2.94:
