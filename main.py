@@ -1,5 +1,6 @@
 import pygame
 import random
+from classes import Enemy, Bullet
 
 WIDTH = 600
 HEIGHT = 600
@@ -17,27 +18,8 @@ YELLOW = (255, 255, 0)
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Shmup!")
+pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
-
-
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, speedx, speedy):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 10))
-        self.image.fill(YELLOW)
-        self.rect = self.image.get_rect()
-        self.rect.bottom = y
-        self.rect.centerx = x
-        self.speedy = speedy
-        self.speedx = speedx
-
-    def update(self):
-        self.rect.y += self.speedy
-        self.rect.x += self.speedx
-        # убить, если он заходит за верхнюю часть экрана
-        if self.rect.bottom < 0 or self.rect.top > HEIGHT or self.rect.left > WIDTH or self.rect.right < 0:
-            self.kill()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -115,22 +97,6 @@ class Player(pygame.sprite.Sprite):
         bullet = Bullet(self.rect.x + 25, self.rect.y + 25, speedx, speedy)
         all_sprites.add(bullet)
         bullets.add(bullet)
-
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.hit_points = 3
-        self.image = pygame.Surface((30, 40))
-        self.image.fill(RED)
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(WIDTH - self.rect.width)
-        self.rect.y = random.randrange(0, 600)
-
-    def update(self):
-        if self.hit_points <= 0:
-            self.kill()
-
-
 
 all_sprites = pygame.sprite.Group()
 player = Player()
