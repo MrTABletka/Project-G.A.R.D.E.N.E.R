@@ -24,7 +24,7 @@ clock = pygame.time.Clock()
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, speedx, speedy):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 20))
+        self.image = pygame.Surface((10, 10))
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
@@ -119,11 +119,17 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
+        self.hit_points = 3
         self.image = pygame.Surface((30, 40))
         self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(0, 600)
+
+    def update(self):
+        if self.hit_points <= 0:
+            self.kill()
+
 
 
 all_sprites = pygame.sprite.Group()
@@ -141,6 +147,9 @@ while running:
     # Держим цикл на правильной скорости
     clock.tick(FPS)
     # Ввод процесса (события)
+    hits = pygame.sprite.groupcollide(enemys, bullets, False, True, pygame.sprite.collide_circle)
+    for hit in hits:
+        hit.hit_points -= 1
     for event in pygame.event.get():
         # проверка для закрытия окна
         if event.type == pygame.QUIT:
@@ -159,3 +168,5 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+#hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
+#hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
