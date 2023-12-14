@@ -15,7 +15,7 @@ YELLOW = (255, 255, 0)
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, speedx, speedy):
+    def __init__(self, x, y, speedx, speedy, damage):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((10, 10))
         self.image.fill(YELLOW)
@@ -24,6 +24,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.centerx = x
         self.speedy = speedy
         self.speedx = speedx
+        self.damage = damage
 
     def update(self):
         self.rect.y += self.speedy
@@ -47,3 +48,16 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         if self.hit_points <= 0:
             self.kill()
+
+class Gun():
+    def __init__(self, damage):
+        self.damage = damage
+
+    def shoot(self, x, y, sp_x, sp_y):
+        bullet = Bullet(x, y, sp_x, sp_y, self.damage)
+        all_sprites.add(bullet)
+        bullets.add(bullet)
+
+all_sprites = pygame.sprite.Group()
+enemys = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
