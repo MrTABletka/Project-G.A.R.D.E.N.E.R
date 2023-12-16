@@ -1,6 +1,6 @@
 import pygame
 import random
-from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys
+from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun
 
 WIDTH = 600
 HEIGHT = 600
@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
-        self.gun = Gun(1)
+        self.gun = Shotgun(2)
 
     def update(self):
         self.speedx = 0
@@ -60,7 +60,10 @@ class Player(pygame.sprite.Sprite):
         speedy = 10
         target_x = x - self.rect.x
         target_y = y - self.rect.y
-        target_xdely = target_x / target_y
+        if target_y:
+            target_xdely = target_x / target_y
+        else:
+            target_xdely = target_x / target_y + 1
         if target_y < 0:
             if target_xdely > 0.34 and target_xdely < 2.94:
                 speedx = -10
@@ -112,7 +115,7 @@ while running:
     # Ввод процесса (события)
     hits = pygame.sprite.groupcollide(enemys, bullets, False, True, pygame.sprite.collide_rect)
     for hit in hits:
-        hit.hit_points -= 1
+        hit.hit_points -= hits[hit][0].get_damage()
 
     for event in pygame.event.get():
         # проверка для закрытия окна
