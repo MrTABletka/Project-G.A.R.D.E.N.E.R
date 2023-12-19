@@ -8,7 +8,7 @@ FPS = 60
 
 # Задаем цвета
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+BLACK = (100, 100, 75)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
@@ -24,8 +24,7 @@ clock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(GREEN)
+        self.image = player_image
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
@@ -39,13 +38,13 @@ class Player(pygame.sprite.Sprite):
         self.speedy = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_a]:
-            self.speedx = -5
+            self.speedx = -3
         if keystate[pygame.K_d]:
-            self.speedx = 5
+            self.speedx = 3
         if keystate[pygame.K_w]:
-            self.speedy = -5
+            self.speedy = -3
         if keystate[pygame.K_s]:
-            self.speedy = 5
+            self.speedy = 3
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.right > WIDTH:
@@ -56,12 +55,12 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
         if self.rect.top < 0:
             self.rect.top = 0
+        if self.gun.reload != 0:
+            self.gun.reload -= 1
         if self.shooting:
             if self.gun.reload == 0:
                 self.shoot(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                self.gun.reload = self.gun.fire_rate
-            else:
-                self.gun.reload -= 1
+
     def change_weapon(self, num):
         self.gun = self.guns[num]
 
@@ -108,9 +107,26 @@ class Player(pygame.sprite.Sprite):
                 speedx = 10
                 speedy = 0
 
-        self.gun.shoot(self.rect.x + 25, self.rect.y + 25, speedx, speedy)
+        self.gun.shoot(self.rect.x + 32, self.rect.y + 48, speedx, speedy)
 
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
 
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self):
+        self.dx = -(player.rect.x + 32 - WIDTH // 2)
+        self.dy = -(player.rect.y + 48 - HEIGHT // 2)
+
+camera = Camera()
+player_image = pygame.image.load('player_stand.png').convert_alpha()
 player = Player()
 all_sprites.add(player)
 for i in range(8):
@@ -141,6 +157,9 @@ while running:
                 player.change_weapon(0)
             if event.key == pygame.K_2:
                 player.change_weapon(1)
+    camera.update()
+    for sprite in all_sprites:
+        camera.apply(sprite)
 
 
     # Обновление

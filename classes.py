@@ -53,7 +53,8 @@ class Enemy(pygame.sprite.Sprite):
 class Gun():
     def __init__(self, damage):
         self.damage = damage
-        self.current_ammo = 70
+        self.current_ammo = 7
+        self.ammo_max = 7
         self.total_ammo = 28
         self.fire_rate = 20
         self.reload = 0
@@ -64,6 +65,13 @@ class Gun():
             bullet = Bullet(x, y, sp_x, sp_y, self.damage)
             all_sprites.add(bullet)
             bullets.add(bullet)
+            self.reload = self.fire_rate
+        else:
+            self.reload_ammo()
+    def reload_ammo(self):
+        self.reload = 120
+        self.current_ammo = self.ammo_max
+        self.total_ammo -= self.ammo_max
 
 class Shotgun(Gun):
     def shoot(self, x, y, sp_x, sp_y):
@@ -103,13 +111,17 @@ class Shotgun(Gun):
             bullet3 = Bullet(x, y, sp_x_3, sp_y_3, self.damage)
             all_sprites.add(bullet3)
             bullets.add(bullet3, bullet2, bullet1)
+            self.reload = self.fire_rate
+        else:
+            self.reload_ammo()
 
 
 class Assault_rifle(Gun):
     def __init__(self, damage):
         self.damage = damage
-        self.current_ammo = 70
-        self.total_ammo = 28
+        self.ammo_max = 30
+        self.current_ammo = 30
+        self.total_ammo = 120
         self.fire_rate = 6
         self.reload = 0
 
