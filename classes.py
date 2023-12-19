@@ -1,8 +1,8 @@
 import pygame
 import random
 
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 1000
+HEIGHT = 800
 FPS = 60
 
 # Задаем цвета
@@ -43,8 +43,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.Surface((30, 40))
         self.image.fill(RED)
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(WIDTH - self.rect.width)
-        self.rect.y = random.randrange(0, 600)
+        self.rect.x = random.randrange(0, WIDTH)
+        self.rect.y = random.randrange(0, HEIGHT)
 
     def update(self):
         if self.hit_points <= 0:
@@ -53,54 +53,65 @@ class Enemy(pygame.sprite.Sprite):
 class Gun():
     def __init__(self, damage):
         self.damage = damage
-        self.current_ammo = 7
+        self.current_ammo = 70
         self.total_ammo = 28
+        self.fire_rate = 20
+        self.reload = 0
 
     def shoot(self, x, y, sp_x, sp_y):
-        bullet = Bullet(x, y, sp_x, sp_y, self.damage)
-        all_sprites.add(bullet)
-        bullets.add(bullet)
+        if self.current_ammo != 0:
+            self.current_ammo -= 1
+            bullet = Bullet(x, y, sp_x, sp_y, self.damage)
+            all_sprites.add(bullet)
+            bullets.add(bullet)
 
 class Shotgun(Gun):
     def shoot(self, x, y, sp_x, sp_y):
-        bullet1 = Bullet(x, y, sp_x, sp_y, self.damage)
-        all_sprites.add(bullet1)
-        sp_x_2 = sp_x
-        sp_y_2 = sp_y
-        sp_x_3 = sp_x
-        sp_y_3 = sp_y
-        if sp_x > 0:
-            if sp_y > 0:
-                sp_y_2 -= 3
-                sp_x_3 -= 3
-            elif sp_y < 0:
+        if self.current_ammo != 0:
+            self.current_ammo -= 1
+            bullet1 = Bullet(x, y, sp_x, sp_y, self.damage)
+            all_sprites.add(bullet1)
+            sp_x_2 = sp_x
+            sp_y_2 = sp_y
+            sp_x_3 = sp_x
+            sp_y_3 = sp_y
+            if sp_x > 0:
+                if sp_y > 0:
+                    sp_y_2 -= 3
+                    sp_x_3 -= 3
+                elif sp_y < 0:
+                    sp_x_2 -= 3
+                    sp_y_3 += 3
+                else:
+                    sp_y_2 -= 3
+                    sp_y_3 += 3
+            elif sp_x < 0:
+                if sp_y > 0:
+                    sp_x_2 += 3
+                    sp_y_3 -= 3
+                elif sp_y < 0:
+                    sp_x_2 += 3
+                    sp_y_3 += 3
+                else:
+                    sp_y_2 += 3
+                    sp_y_3 -= 3
+            else:
                 sp_x_2 -= 3
-                sp_y_3 += 3
-            else:
-                sp_y_2 -= 3
-                sp_y_3 += 3
-        elif sp_x < 0:
-            if sp_y > 0:
-                sp_x_2 += 3
-                sp_y_3 -= 3
-            elif sp_y < 0:
-                sp_x_2 += 3
-                sp_y_3 += 3
-            else:
-                sp_y_2 += 3
-                sp_y_3 -= 3
-        else:
-            sp_x_2 -= 3
-            sp_x_3 += 3
-        bullet2 = Bullet(x, y, sp_x_2, sp_y_2, self.damage)
-        all_sprites.add(bullet2)
-        bullet3 = Bullet(x, y, sp_x_3, sp_y_3, self.damage)
-        all_sprites.add(bullet3)
-        bullets.add(bullet3, bullet2, bullet1)
+                sp_x_3 += 3
+            bullet2 = Bullet(x, y, sp_x_2, sp_y_2, self.damage)
+            all_sprites.add(bullet2)
+            bullet3 = Bullet(x, y, sp_x_3, sp_y_3, self.damage)
+            all_sprites.add(bullet3)
+            bullets.add(bullet3, bullet2, bullet1)
 
 
 class Assault_rifle(Gun):
-    pass
+    def __init__(self, damage):
+        self.damage = damage
+        self.current_ammo = 70
+        self.total_ammo = 28
+        self.fire_rate = 6
+        self.reload = 0
 
 all_sprites = pygame.sprite.Group()
 enemys = pygame.sprite.Group()

@@ -1,9 +1,9 @@
 import pygame
 import random
-from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun
+from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle
 
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 1000
+HEIGHT = 800
 FPS = 60
 
 # Задаем цвета
@@ -30,7 +30,9 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
-        self.gun = Shotgun(2)
+        self.guns = [Shotgun(2), Assault_rifle(3)]
+        self.gun = self.guns[1]
+        self.shooting = False
 
     def update(self):
         self.speedx = 0
@@ -54,6 +56,14 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
         if self.rect.top < 0:
             self.rect.top = 0
+        if self.shooting:
+            if self.gun.reload == 0:
+                self.shoot(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                self.gun.reload = self.gun.fire_rate
+            else:
+                self.gun.reload -= 1
+    def change_weapon(self, num):
+        self.gun = self.guns[num]
 
     def shoot(self, x, y):
         speedx = 10
@@ -63,7 +73,7 @@ class Player(pygame.sprite.Sprite):
         if target_y:
             target_xdely = target_x / target_y
         else:
-            target_xdely = target_x / target_y + 1
+            target_xdely = target_x / (target_y + 1)
         if target_y < 0:
             if target_xdely > 0.34 and target_xdely < 2.94:
                 speedx = -10
@@ -123,7 +133,15 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            player.shoot(event.pos[0], event.pos[1])
+            player.shooting = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            player.shooting = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:
+                player.change_weapon(0)
+            if event.key == pygame.K_2:
+                player.change_weapon(1)
+
 
     # Обновление
     all_sprites.update()
