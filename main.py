@@ -21,10 +21,34 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
 
+
+class Marker(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((0,0))
+        self.image.fill((100, 200, 100))
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+    def update(self):
+        if self.rect.x > WIDTH:
+            player.rect.x += 5
+        elif self.rect.x < - WIDTH:
+            player.rect.x -= 5
+        if self.rect.y > HEIGHT:
+            player.rect.y += 5
+        elif self.rect.y < - HEIGHT:
+            player.rect.y -= 5
+
+
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = player_image
+        self.image_right = player_image
+        self.left_image = pygame.transform.flip(player_image, True, False)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
@@ -39,8 +63,10 @@ class Player(pygame.sprite.Sprite):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_a]:
             self.speedx = -3
+            self.image = self.left_image
         if keystate[pygame.K_d]:
             self.speedx = 3
+            self.image = self.image_right
         if keystate[pygame.K_w]:
             self.speedy = -3
         if keystate[pygame.K_s]:
@@ -63,6 +89,7 @@ class Player(pygame.sprite.Sprite):
 
     def change_weapon(self, num):
         self.gun = self.guns[num]
+
 
     def shoot(self, x, y):
         speedx = 10
@@ -128,6 +155,8 @@ class Camera:
 camera = Camera()
 player_image = pygame.image.load('player_stand.png').convert_alpha()
 player = Player()
+mark = Marker()
+all_sprites.add(mark)
 all_sprites.add(player)
 for i in range(8):
     m = Enemy()
@@ -157,13 +186,14 @@ while running:
                 player.change_weapon(0)
             if event.key == pygame.K_2:
                 player.change_weapon(1)
+    all_sprites.update()
     camera.update()
     for sprite in all_sprites:
         camera.apply(sprite)
 
 
     # Обновление
-    all_sprites.update()
+
 
     # Рендеринг
     screen.fill(BLACK)
