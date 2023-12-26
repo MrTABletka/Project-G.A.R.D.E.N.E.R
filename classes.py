@@ -41,22 +41,43 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.hit_points = 4
         self.image = pygame.Surface((30, 40))
-        self.image.fill(RED)
+        color = random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 255)
+        self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH)
         self.rect.y = random.randrange(0, HEIGHT)
     def update(self):
+        x = 0
+        y = 0
         if self.rect.x > 468:
-            self.rect.x -= 4
-        if self.rect.x < 468:
-            self.rect.x += 4
-        if self.rect.y > 468:
-            self.rect.y -= 4
-        if self.rect.y < 468:
-            self.rect.y += 4
-        print('aa')
+            self.rect.x -= 1
+            x = -1
+        if self.rect.x <= 468:
+            self.rect.x += 1
+            x = 1
+        if self.rect.y >= 352:
+            self.rect.y -= 1
+            y = -1
+        if self.rect.y <= 352:
+            self.rect.y += 1
+            y = 1
 
-    def update(self):
+        for e in enemys:
+            if len(enemys) == 1:
+                break
+            if pygame.sprite.collide_rect(self, e):  # если есть пересечение платформы с игроком
+                if self.rect.right != e.rect.right or self.rect.top != e.rect.top:
+                    if x > 0:  # если движется вправо
+                        self.rect.right = e.rect.left
+
+                    if x < 0:  # если движется влево
+                        self.rect.left = e.rect.right
+
+                    if y > 0:  # если падает вниз
+                        self.rect.bottom = e.rect.top
+
+                    if y < 0:  # если движется вверх
+                        self.rect.top = e.rect.bottom
         if self.hit_points <= 0:
             self.kill()
 
