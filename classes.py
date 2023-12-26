@@ -45,6 +45,16 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH)
         self.rect.y = random.randrange(0, HEIGHT)
+    def update(self):
+        if self.rect.x > 468:
+            self.rect.x -= 4
+        if self.rect.x < 468:
+            self.rect.x += 4
+        if self.rect.y > 468:
+            self.rect.y -= 4
+        if self.rect.y < 468:
+            self.rect.y += 4
+        print('aa')
 
     def update(self):
         if self.hit_points <= 0:
@@ -124,6 +134,7 @@ class Assault_rifle(Gun):
         self.total_ammo = 120
         self.fire_rate = 6
         self.reload = 0
+
 
 all_sprites = pygame.sprite.Group()
 enemys = pygame.sprite.Group()

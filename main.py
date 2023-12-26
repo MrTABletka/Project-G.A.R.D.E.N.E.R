@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle
 
 WIDTH = 1000
@@ -20,6 +21,20 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
+
+
+def show_ammo(player):
+    font1 = pygame.font.Font(None, 100)
+    font2 = pygame.font.Font(None, 50)
+    text = font1.render(str(player.gun.current_ammo), True, (0, 0, 0))
+    text2 = font2.render(str(round(player.gun.reload / 60, 1)), True, (0, 0, 0))
+    text_x = player.rect.x + 200
+    text_y = player.rect.y + 300
+    text_w = text.get_width()
+    text_h = text.get_height()
+    screen.blit(text, (text_x, text_y))
+    if player.gun.reload / 60 > 0.4:
+        screen.blit(text2, (text_x - 200, text_y - 200))
 
 
 class Marker(pygame.sprite.Sprite):
@@ -162,6 +177,7 @@ for i in range(8):
     m = Enemy()
     all_sprites.add(m)
     enemys.add(m)
+
 # Цикл игры
 running = True
 while running:
@@ -191,13 +207,13 @@ while running:
     for sprite in all_sprites:
         camera.apply(sprite)
 
-
     # Обновление
-
 
     # Рендеринг
     screen.fill(BLACK)
+
     all_sprites.draw(screen)
+    show_ammo(player)
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
 
