@@ -14,6 +14,11 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
 
+def increase_score(num):
+    global score
+    score[0] += num
+
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, speedx, speedy, damage):
         pygame.sprite.Sprite.__init__(self)
@@ -80,6 +85,7 @@ class Enemy(pygame.sprite.Sprite):
                         self.rect.top = e.rect.bottom
         if self.hit_points <= 0:
             self.kill()
+            increase_score(10)
 
 class Gun():
     def __init__(self, damage):
@@ -157,6 +163,7 @@ class Assault_rifle(Gun):
         self.reload = 0
 
 
+score = [0]
 all_sprites = pygame.sprite.Group()
 enemys = pygame.sprite.Group()
 bullets = pygame.sprite.Group()

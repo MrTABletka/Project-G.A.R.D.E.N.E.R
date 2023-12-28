@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle
+from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle, score
 
 WIDTH = 1000
 HEIGHT = 800
@@ -15,13 +15,13 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
+
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
-
 
 def show_ammo(player):
     font1 = pygame.font.Font(None, 100)
@@ -167,6 +167,48 @@ class Camera:
         self.dx = -(player.rect.x + 32 - WIDTH // 2)
         self.dy = -(player.rect.y + 48 - HEIGHT // 2)
 
+def main_game():
+    global score
+    running = True
+    while running:
+        # Держим цикл на правильной скорости
+        clock.tick(FPS)
+        # Ввод процесса (события)
+        hits = pygame.sprite.groupcollide(enemys, bullets, False, True, pygame.sprite.collide_rect)
+        for hit in hits:
+            hit.hit_points -= hits[hit][0].get_damage()
+
+        for event in pygame.event.get():
+            # проверка для закрытия окна
+            if event.type == pygame.QUIT:
+                running = False
+                return score[0]
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                player.shooting = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                player.shooting = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    player.change_weapon(0)
+                if event.key == pygame.K_2:
+                    player.change_weapon(1)
+        all_sprites.update()
+        camera.update()
+        for sprite in all_sprites:
+            camera.apply(sprite)
+
+        # Обновление
+
+        # Рендеринг
+        screen.fill(BLACK)
+
+        all_sprites.draw(screen)
+        show_ammo(player)
+        # После отрисовки всего, переворачиваем экран
+        pygame.display.flip()
+
+
 camera = Camera()
 player_image = pygame.image.load('player_stand.png').convert_alpha()
 player = Player()
@@ -177,46 +219,7 @@ for i in range(8):
     m = Enemy()
     all_sprites.add(m)
     enemys.add(m)
-
-# Цикл игры
-running = True
-while running:
-    # Держим цикл на правильной скорости
-    clock.tick(FPS)
-    # Ввод процесса (события)
-    hits = pygame.sprite.groupcollide(enemys, bullets, False, True, pygame.sprite.collide_rect)
-    for hit in hits:
-        hit.hit_points -= hits[hit][0].get_damage()
-
-    for event in pygame.event.get():
-        # проверка для закрытия окна
-        if event.type == pygame.QUIT:
-            running = False
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            player.shooting = True
-        elif event.type == pygame.MOUSEBUTTONUP:
-            player.shooting = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_1:
-                player.change_weapon(0)
-            if event.key == pygame.K_2:
-                player.change_weapon(1)
-    all_sprites.update()
-    camera.update()
-    for sprite in all_sprites:
-        camera.apply(sprite)
-
-    # Обновление
-
-    # Рендеринг
-    screen.fill(BLACK)
-
-    all_sprites.draw(screen)
-    show_ammo(player)
-    # После отрисовки всего, переворачиваем экран
-    pygame.display.flip()
-
+print(main_game())
 pygame.quit()
 #hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
 #hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
