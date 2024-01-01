@@ -1,7 +1,8 @@
 import pygame
 import random
 import sys
-from classes import Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle, score
+from classes import (Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle, score, Box, Item, boxes,
+                     Medkit, Ammo_box)
 
 WIDTH = 1000
 HEIGHT = 800
@@ -23,18 +24,22 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
 
-def show_ammo(player):
+def show_stats(player):
     font1 = pygame.font.Font(None, 100)
     font2 = pygame.font.Font(None, 50)
-    text = font1.render(str(player.gun.current_ammo), True, (0, 0, 0))
-    text2 = font2.render(str(round(player.gun.reload / 60, 1)), True, (0, 0, 0))
-    text_x = player.rect.x + 200
-    text_y = player.rect.y + 300
-    text_w = text.get_width()
-    text_h = text.get_height()
-    screen.blit(text, (text_x, text_y))
+    cur_ammo = font1.render(str(player.gun.current_ammo), True, (0, 0, 0))
+    reload_num = font2.render(str(round(player.gun.reload / 60, 1)), True, (0, 0, 0))
+    total_ammo = font1.render(str(player.gun.total_ammo), True, (0, 0, 0))
+    medkits = font1.render(str(player.medkits), True, (0, 0, 0))
+    text_x = player.rect.x + 390
+    text_y = player.rect.y + 310
+    text_w = cur_ammo.get_width()
+    text_h = cur_ammo.get_height()
+    screen.blit(cur_ammo, (text_x, text_y))
+    screen.blit(total_ammo, (text_x, text_y + 60))
+    screen.blit(medkits, (text_x - 700, text_y + 50))
     if player.gun.reload / 60 > 0.4:
-        screen.blit(text2, (text_x - 200, text_y - 200))
+        screen.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
 
 
 class Marker(pygame.sprite.Sprite):
@@ -56,21 +61,27 @@ class Marker(pygame.sprite.Sprite):
             player.rect.y -= 5
 
 
-
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = player_image
-        self.image_right = player_image
-        self.left_image = pygame.transform.flip(player_image, True, False)
+        self.image_stand = player_image
+        self.image = self.image_stand
+        self.image_run1 = player_run1
+        self.image_run2 = player_run2
+        self.images = [self.image_stand, self.image_run1, self.image_run2]
+        self.image_num = 0
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
         self.guns = [Shotgun(2), Assault_rifle(3)]
-        self.gun = self.guns[1]
+        self.gun = self.guns[0]
+        self.hit_points = 100
+        self.medkits = 0
+        self.change_sprite = 30
         self.shooting = False
+        self.left = False
+        self.moved = False
 
     def update(self):
         self.speedx = 0
@@ -78,14 +89,22 @@ class Player(pygame.sprite.Sprite):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_a]:
             self.speedx = -3
-            self.image = self.left_image
+            self.left = True
+            self.change_sprite -= 1
+            self.moved = True
         if keystate[pygame.K_d]:
             self.speedx = 3
-            self.image = self.image_right
+            self.left = False
+            self.change_sprite -= 1
+            self.moved = True
         if keystate[pygame.K_w]:
             self.speedy = -3
+            self.change_sprite -= 1
+            self.moved = True
         if keystate[pygame.K_s]:
             self.speedy = 3
+            self.change_sprite -= 1
+            self.moved = True
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.right > WIDTH:
@@ -101,6 +120,25 @@ class Player(pygame.sprite.Sprite):
         if self.shooting:
             if self.gun.reload == 0:
                 self.shoot(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
+        if self.change_sprite <= 0:
+            if self.image_num == 0:
+                self.image = self.images[1]
+                self.image_num = 1
+            elif self.image_num == 1:
+                self.image = self.images[2]
+                self.image_num = 2
+            elif self.image_num == 2:
+                self.image = self.images[1]
+                self.image_num = 1
+            self.change_sprite = 30
+        if self.moved == False:
+            self.image = self.images[0]
+            self.image_num = 0
+        self.moved = False
+        if self.left == True:
+            self.image = pygame.transform.flip(self.images[self.image_num], True, False)
+
 
     def change_weapon(self, num):
         self.gun = self.guns[num]
@@ -167,9 +205,30 @@ class Camera:
         self.dx = -(player.rect.x + 32 - WIDTH // 2)
         self.dy = -(player.rect.y + 48 - HEIGHT // 2)
 
-def main_game():
+def main_game(map):
     global score
     running = True
+    for i in range(len(map)):
+        for j in range(len(map[i])):
+            if map[i][j] == 1:
+                m = Enemy(j * 100, i * 100)
+                all_sprites.add(m)
+                enemys.add(m)
+            elif map[i][j] == 2:
+                c = Box(j * 100, i * 100, box_image, player)
+                all_sprites.add(c)
+                boxes.add(c)
+            elif map[i][j] == 3:
+                c = Medkit(j * 100, i * 100, medkit_image, player)
+                all_sprites.add(c)
+            elif map[i][j] == 4:
+                c = Ammo_box(j * 100, i * 100, shotgun_ammo, player, 'Shotgun')
+                all_sprites.add(c)
+            elif map[i][j] == 5:
+                c = Ammo_box(j * 100, i * 100, rifle_ammo, player, 'Rifle')
+                all_sprites.add(c)
+
+
     while running:
         # Держим цикл на правильной скорости
         clock.tick(FPS)
@@ -193,6 +252,8 @@ def main_game():
                     player.change_weapon(0)
                 if event.key == pygame.K_2:
                     player.change_weapon(1)
+                if event.key == pygame.K_r:
+                    player.gun.reload_ammo()
         all_sprites.update()
         camera.update()
         for sprite in all_sprites:
@@ -204,22 +265,24 @@ def main_game():
         screen.fill(BLACK)
 
         all_sprites.draw(screen)
-        show_ammo(player)
+        show_stats(player)
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
 
-
+carta = [[0, 1, 2, 0, 0, 0, 1, 2], [2, 2, 1, 2, 2, 3, 4, 5]]
 camera = Camera()
-player_image = pygame.image.load('player_stand.png').convert_alpha()
+box_image = pygame.image.load('Images/box.png').convert_alpha()
+player_image = pygame.image.load('Images/player_stand.png').convert_alpha()
+player_run1 = pygame.image.load('Images/player_run1.png').convert_alpha()
+player_run2 = pygame.image.load('Images/player_run2.png').convert_alpha()
+medkit_image = pygame.image.load('Images/medkit.png').convert_alpha()
+shotgun_ammo = pygame.image.load('Images/shotgun_ammo.png').convert_alpha()
+rifle_ammo = pygame.image.load('Images/ammo_rifle.png').convert_alpha()
 player = Player()
 mark = Marker()
 all_sprites.add(mark)
 all_sprites.add(player)
-for i in range(8):
-    m = Enemy()
-    all_sprites.add(m)
-    enemys.add(m)
-print(main_game())
+print(main_game(carta))
 pygame.quit()
 #hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
 #hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)

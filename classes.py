@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 
 WIDTH = 1000
 HEIGHT = 800
@@ -12,6 +13,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+pygame.init()
 
 
 def increase_score(num):
@@ -42,15 +44,15 @@ class Bullet(pygame.sprite.Sprite):
         return self.damage
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.hit_points = 4
         self.image = pygame.Surface((30, 40))
         color = random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 255)
         self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(0, WIDTH)
-        self.rect.y = random.randrange(0, HEIGHT)
+        self.rect.x = x
+        self.rect.y = y
     def update(self):
         x = 0
         y = 0
@@ -106,9 +108,10 @@ class Gun():
         else:
             self.reload_ammo()
     def reload_ammo(self):
-        self.reload = 120
-        self.current_ammo = self.ammo_max
-        self.total_ammo -= self.ammo_max
+        if self.total_ammo != 0:
+            self.reload = 120
+            self.current_ammo = self.ammo_max
+            self.total_ammo -= self.ammo_max
 
 class Shotgun(Gun):
     def shoot(self, x, y, sp_x, sp_y):
@@ -162,8 +165,71 @@ class Assault_rifle(Gun):
         self.fire_rate = 6
         self.reload = 0
 
+class Box(pygame.sprite.Sprite):
+    def __init__(self, x, y, image, pl):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.hit_points = 5
+        self.player = pl
+
+    def update(self):
+        if pygame.sprite.collide_rect(self, self.player):
+            if self.player.speedx != 0:
+                if self.player.speedx < 0:
+                    self.player.rect.x += 3
+
+                if self.player.speedx > 0:
+                    self.player.rect.x -= 3
+            if self.player.speedy != 0:
+                if self.player.speedy < 0:
+                    self.player.rect.y += 3
+
+                if self.player.speedy > 0:
+                    self.player.rect.y -= 3
+
+        if self.hit_points <= 0:
+            self.kill()
+            increase_score(10)
+
+class Item(pygame.sprite.Sprite):
+    def __init__(self, x, y, image, pl):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.hit_points = 5
+        self.player = pl
+
+class Medkit(Item):
+    def update(self):
+        if pygame.sprite.collide_rect(self, self.player):
+            self.player.medkits += 1
+            self.kill()
+
+
+class Ammo_box(Item):
+    def __init__(self, x, y, image, pl, type):
+        super().__init__(x, y, image, pl)
+        self.type = type
+
+    def update(self):
+        if pygame.sprite.collide_rect(self, self.player):
+            if self.type == 'Shotgun':
+                self.player.guns[0].total_ammo += 7
+            elif self.type == 'Rifle':
+                self.player.guns[1].total_ammo += 30
+            self.kill()
+
+class Text(Item):
+    pass
+
 
 score = [0]
 all_sprites = pygame.sprite.Group()
 enemys = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
+boxes = pygame.sprite.Group()
