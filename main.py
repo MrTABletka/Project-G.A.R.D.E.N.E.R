@@ -30,14 +30,16 @@ def show_stats(player):
     cur_ammo = font1.render(str(player.gun.current_ammo), True, (0, 0, 0))
     reload_num = font2.render(str(round(player.gun.reload / 60, 1)), True, (0, 0, 0))
     total_ammo = font1.render(str(player.gun.total_ammo), True, (0, 0, 0))
+    hp = font1.render(str(player.hit_points), True, (0, 0, 0))
     medkits = font1.render(str(player.medkits), True, (0, 0, 0))
     text_x = player.rect.x + 390
     text_y = player.rect.y + 310
     text_w = cur_ammo.get_width()
     text_h = cur_ammo.get_height()
+    screen.blit(hp, (player.rect.x - 450, player.rect.y + 350))
     screen.blit(cur_ammo, (text_x, text_y))
     screen.blit(total_ammo, (text_x, text_y + 60))
-    screen.blit(medkits, (text_x - 700, text_y + 50))
+    screen.blit(medkits, (text_x - 670, text_y + 40))
     if player.gun.reload / 60 > 0.4:
         screen.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
 
@@ -157,7 +159,6 @@ class Player(pygame.sprite.Sprite):
             if target_xdely > 0.34 and target_xdely < 2.94:
                 speedx = -10
                 speedy = -10
-                target = 'top_left'
             elif target_xdely > -0.34 and target_xdely < 0.34:
                 speedx = 0
                 speedy = -10
@@ -211,7 +212,7 @@ def main_game(map):
     for i in range(len(map)):
         for j in range(len(map[i])):
             if map[i][j] == 1:
-                m = Enemy(j * 100, i * 100)
+                m = Enemy(j * 100, i * 100, player)
                 all_sprites.add(m)
                 enemys.add(m)
             elif map[i][j] == 2:
@@ -237,6 +238,9 @@ def main_game(map):
         for hit in hits:
             hit.hit_points -= hits[hit][0].get_damage()
 
+        if player.hit_points <= 0:
+            running = False
+            return score[0]
         for event in pygame.event.get():
             # проверка для закрытия окна
             if event.type == pygame.QUIT:
@@ -254,6 +258,10 @@ def main_game(map):
                     player.change_weapon(1)
                 if event.key == pygame.K_r:
                     player.gun.reload_ammo()
+                if event.key == pygame.K_f:
+                    if player.medkits > 0:
+                        player.hit_points += 20
+                        player.medkits -= 1
         all_sprites.update()
         camera.update()
         for sprite in all_sprites:

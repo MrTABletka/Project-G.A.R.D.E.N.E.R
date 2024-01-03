@@ -44,7 +44,7 @@ class Bullet(pygame.sprite.Sprite):
         return self.damage
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, pl):
         pygame.sprite.Sprite.__init__(self)
         self.hit_points = 4
         self.image = pygame.Surface((30, 40))
@@ -53,6 +53,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.player = pl
+        self.reload = 30
     def update(self):
         x = 0
         y = 0
@@ -72,7 +74,7 @@ class Enemy(pygame.sprite.Sprite):
         for e in enemys:
             if len(enemys) == 1:
                 break
-            if pygame.sprite.collide_rect(self, e):  # если есть пересечение платформы с игроком
+            if pygame.sprite.collide_rect(self, e):
                 if self.rect.right != e.rect.right or self.rect.top != e.rect.top:
                     if x > 0:  # если движется вправо
                         self.rect.right = e.rect.left
@@ -85,6 +87,11 @@ class Enemy(pygame.sprite.Sprite):
 
                     if y < 0:  # если движется вверх
                         self.rect.top = e.rect.bottom
+        if pygame.sprite.collide_rect(self, self.player) and self.reload == 0:
+            self.reload += 31
+            self.player.hit_points -= 15
+        if self.reload != 0:
+            self.reload -= 1
         if self.hit_points <= 0:
             self.kill()
             increase_score(10)
