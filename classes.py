@@ -43,6 +43,7 @@ class Bullet(pygame.sprite.Sprite):
     def get_damage(self):
         return self.damage
 
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, pl):
         pygame.sprite.Sprite.__init__(self)
@@ -55,6 +56,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = y
         self.player = pl
         self.reload = 30
+
     def update(self):
         x = 0
         y = 0
@@ -96,8 +98,16 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
             increase_score(10)
 
-class Gun():
-    def __init__(self, damage):
+
+class Gun(pygame.sprite.Sprite):
+    def __init__(self, damage, pl, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.hit_points = 4
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.player = pl
+        self.rect.x = self.player.rect.x
+        self.rect.y = self.player.rect.y + 48
         self.damage = damage
         self.current_ammo = 7
         self.ammo_max = 7
@@ -114,11 +124,18 @@ class Gun():
             self.reload = self.fire_rate
         else:
             self.reload_ammo()
+        self.kill()
+
     def reload_ammo(self):
         if self.total_ammo != 0:
             self.reload = 120
             self.current_ammo = self.ammo_max
             self.total_ammo -= self.ammo_max
+
+    def update(self):
+        self.rect.x = self.player.rect.x + 12
+        self.rect.y = self.player.rect.y + 48
+
 
 class Shotgun(Gun):
     def shoot(self, x, y, sp_x, sp_y):
@@ -164,13 +181,21 @@ class Shotgun(Gun):
 
 
 class Assault_rifle(Gun):
-    def __init__(self, damage):
+    def __init__(self, damage, pl, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.hit_points = 4
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.player = pl
+        self.rect.x = self.player.rect.x
+        self.rect.y = self.player.rect.y + 40
         self.damage = damage
         self.ammo_max = 30
         self.current_ammo = 30
         self.total_ammo = 120
         self.fire_rate = 6
         self.reload = 0
+
 
 class Box(pygame.sprite.Sprite):
     def __init__(self, x, y, image, pl):
@@ -201,6 +226,7 @@ class Box(pygame.sprite.Sprite):
             self.kill()
             increase_score(10)
 
+
 class Item(pygame.sprite.Sprite):
     def __init__(self, x, y, image, pl):
         pygame.sprite.Sprite.__init__(self)
@@ -210,6 +236,7 @@ class Item(pygame.sprite.Sprite):
         self.rect.y = y
         self.hit_points = 5
         self.player = pl
+
 
 class Medkit(Item):
     def update(self):
@@ -230,6 +257,7 @@ class Ammo_box(Item):
             elif self.type == 'Rifle':
                 self.player.guns[1].total_ammo += 30
             self.kill()
+
 
 class Text(Item):
     pass

@@ -24,6 +24,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
 
+
 def show_stats(player):
     font1 = pygame.font.Font(None, 100)
     font2 = pygame.font.Font(None, 50)
@@ -52,6 +53,7 @@ class Marker(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 0
         self.rect.y = 0
+
     def update(self):
         if self.rect.x > WIDTH:
             player.rect.x += 5
@@ -70,13 +72,15 @@ class Player(pygame.sprite.Sprite):
         self.image = self.image_stand
         self.image_run1 = player_run1
         self.image_run2 = player_run2
+        all_sprites.add(self)
         self.images = [self.image_stand, self.image_run1, self.image_run2]
         self.image_num = 0
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
-        self.guns = [Shotgun(2), Assault_rifle(3)]
+        self.guns = [Shotgun(2, self, shotgun_image), Assault_rifle(3, self, shotgun_image)]
+        all_sprites.add(self.guns[0], self.guns[1])
         self.gun = self.guns[0]
         self.hit_points = 100
         self.medkits = 0
@@ -134,17 +138,15 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.images[1]
                 self.image_num = 1
             self.change_sprite = 30
-        if self.moved == False:
+        if not self.moved:
             self.image = self.images[0]
             self.image_num = 0
         self.moved = False
-        if self.left == True:
+        if self.left:
             self.image = pygame.transform.flip(self.images[self.image_num], True, False)
-
 
     def change_weapon(self, num):
         self.gun = self.guns[num]
-
 
     def shoot(self, x, y):
         speedx = 10
@@ -188,7 +190,8 @@ class Player(pygame.sprite.Sprite):
                 speedx = 10
                 speedy = 0
 
-        self.gun.shoot(self.rect.x + 32, self.rect.y + 48, speedx, speedy)
+        self.gun.shoot(self.rect.x + 32, self.rect.y + 60, speedx, speedy)
+
 
 class Camera:
     # зададим начальный сдвиг камеры
@@ -205,6 +208,7 @@ class Camera:
     def update(self):
         self.dx = -(player.rect.x + 32 - WIDTH // 2)
         self.dy = -(player.rect.y + 48 - HEIGHT // 2)
+
 
 def main_game(map):
     global score
@@ -228,7 +232,6 @@ def main_game(map):
             elif map[i][j] == 5:
                 c = Ammo_box(j * 100, i * 100, rifle_ammo, player, 'Rifle')
                 all_sprites.add(c)
-
 
     while running:
         # Держим цикл на правильной скорости
@@ -277,6 +280,7 @@ def main_game(map):
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
 
+
 carta = [[0, 1, 2, 0, 0, 0, 1, 2], [2, 2, 1, 2, 2, 3, 4, 5]]
 camera = Camera()
 box_image = pygame.image.load('Images/box.png').convert_alpha()
@@ -286,11 +290,9 @@ player_run2 = pygame.image.load('Images/player_run2.png').convert_alpha()
 medkit_image = pygame.image.load('Images/medkit.png').convert_alpha()
 shotgun_ammo = pygame.image.load('Images/shotgun_ammo.png').convert_alpha()
 rifle_ammo = pygame.image.load('Images/ammo_rifle.png').convert_alpha()
+shotgun_image = pygame.image.load('Images/shotgun_defolt.png').convert_alpha()
 player = Player()
 mark = Marker()
 all_sprites.add(mark)
-all_sprites.add(player)
 print(main_game(carta))
 pygame.quit()
-#hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
-#hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
