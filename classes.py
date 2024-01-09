@@ -260,7 +260,14 @@ class Ammo_box(Item):
 
 
 class Text(Item):
-    pass
+    def __init__(self, x, y, image, pl, type):
+        super().__init__(x, y, image, pl)
+        self.num = int(type)
+    def update(self):
+        if pygame.sprite.collide_rect(self, self.player):
+            self.player.collected.append(self.num)
+            self.kill()
+
 
 
 score = [0]

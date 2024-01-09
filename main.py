@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 from classes import (Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle, score, Box, Item, boxes,
-                     Medkit, Ammo_box)
+                     Medkit, Ammo_box, Text)
 
 WIDTH = 1000
 HEIGHT = 800
@@ -88,6 +88,7 @@ class Player(pygame.sprite.Sprite):
         self.shooting = False
         self.left = False
         self.moved = False
+        self.collected = []
 
     def update(self):
         self.speedx = 0
@@ -215,22 +216,26 @@ def main_game(map):
     running = True
     for i in range(len(map)):
         for j in range(len(map[i])):
-            if map[i][j] == 1:
-                m = Enemy(j * 100, i * 100, player)
+            if map[i][j] == 'b':
+                m = Box(j * 100, i * 100,box_image, player)
                 all_sprites.add(m)
-                enemys.add(m)
-            elif map[i][j] == 2:
-                c = Box(j * 100, i * 100, box_image, player)
+                boxes.add(m)
+            elif map[i][j][0] == 'e':
+                c = Enemy(j * 100, i * 100, player)
                 all_sprites.add(c)
-                boxes.add(c)
-            elif map[i][j] == 3:
+                enemys.add(c)
+            elif map[i][j] == 'm':
                 c = Medkit(j * 100, i * 100, medkit_image, player)
                 all_sprites.add(c)
-            elif map[i][j] == 4:
-                c = Ammo_box(j * 100, i * 100, shotgun_ammo, player, 'Shotgun')
-                all_sprites.add(c)
-            elif map[i][j] == 5:
-                c = Ammo_box(j * 100, i * 100, rifle_ammo, player, 'Rifle')
+            elif map[i][j][0] == 'a':
+                if map[i][j][1] == 'r':
+                    c = Ammo_box(j * 100, i * 100, rifle_ammo, player, 'Rifle')
+                    all_sprites.add(c)
+                elif map[i][j][1] == 's':
+                    c = Ammo_box(j * 100, i * 100, shotgun_ammo, player, 'Shotgun')
+                    all_sprites.add(c)
+            elif map[i][j][0] == 't':
+                c = Text(j * 100, i * 100, text_image, player, map[i][j][1])
                 all_sprites.add(c)
 
     while running:
@@ -243,12 +248,12 @@ def main_game(map):
 
         if player.hit_points <= 0:
             running = False
-            return score[0]
+            return [score[0], player.collected]
         for event in pygame.event.get():
             # проверка для закрытия окна
             if event.type == pygame.QUIT:
                 running = False
-                return score[0]
+                return [score[0], player.collected]
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 player.shooting = True
@@ -281,7 +286,7 @@ def main_game(map):
         pygame.display.flip()
 
 
-carta = [[0, 1, 2, 0, 0, 0, 1, 2], [2, 2, 1, 2, 2, 3, 4, 5]]
+carta = [['v', 'b', 'e', 'ar', 'v', 'v', 'b', 'e'], ['v', 'b', 'e', 'as', 'm', 't1', 'b', 'e'], ['t3']]
 camera = Camera()
 box_image = pygame.image.load('Images/box.png').convert_alpha()
 player_image = pygame.image.load('Images/player_stand.png').convert_alpha()
@@ -291,6 +296,7 @@ medkit_image = pygame.image.load('Images/medkit.png').convert_alpha()
 shotgun_ammo = pygame.image.load('Images/shotgun_ammo.png').convert_alpha()
 rifle_ammo = pygame.image.load('Images/ammo_rifle.png').convert_alpha()
 shotgun_image = pygame.image.load('Images/shotgun_defolt.png').convert_alpha()
+text_image = pygame.image.load('Images/disckette.png').convert_alpha()
 player = Player()
 mark = Marker()
 all_sprites.add(mark)
