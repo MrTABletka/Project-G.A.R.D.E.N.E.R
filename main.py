@@ -25,7 +25,7 @@ pygame.display.set_caption("Gardener")
 clock = pygame.time.Clock()
 
 
-def show_stats(player):
+def show_stats(player, screen1):
     font1 = pygame.font.Font(None, 100)
     font2 = pygame.font.Font(None, 50)
     cur_ammo = font1.render(str(player.gun.current_ammo), True, (0, 0, 0))
@@ -37,12 +37,12 @@ def show_stats(player):
     text_y = player.rect.y + 310
     text_w = cur_ammo.get_width()
     text_h = cur_ammo.get_height()
-    screen.blit(hp, (player.rect.x - 450, player.rect.y + 350))
-    screen.blit(cur_ammo, (text_x, text_y))
-    screen.blit(total_ammo, (text_x, text_y + 60))
-    screen.blit(medkits, (text_x - 670, text_y + 40))
+    screen1.blit(hp, (player.rect.x - 450, player.rect.y + 350))
+    screen1.blit(cur_ammo, (text_x, text_y))
+    screen1.blit(total_ammo, (text_x, text_y + 60))
+    screen1.blit(medkits, (text_x - 670, text_y + 40))
     if player.gun.reload / 60 > 0.4:
-        screen.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
+        screen1.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
 
 
 class Marker(pygame.sprite.Sprite):
@@ -212,6 +212,9 @@ class Camera:
 
 
 def main_game(map):
+    pygame.init()
+    pygame.mixer.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
     global score
     running = True
     for i in range(len(map)):
@@ -281,12 +284,11 @@ def main_game(map):
         screen.fill(BLACK)
 
         all_sprites.draw(screen)
-        show_stats(player)
+        show_stats(player, screen)
         # После отрисовки всего, переворачиваем экран
         pygame.display.flip()
 
 
-carta = [['v', 'b', 'e', 'ar', 'v', 'v', 'b', 'e'], ['v', 'b', 'e', 'as', 'm', 't1', 'b', 'e'], ['t3']]
 camera = Camera()
 box_image = pygame.image.load('Images/box.png').convert_alpha()
 player_image = pygame.image.load('Images/player_stand.png').convert_alpha()
@@ -300,5 +302,5 @@ text_image = pygame.image.load('Images/disckette.png').convert_alpha()
 player = Player()
 mark = Marker()
 all_sprites.add(mark)
-print(main_game(carta))
+
 pygame.quit()

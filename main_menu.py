@@ -1,5 +1,6 @@
 import pygame
 import sys
+from main import main_game
 
 pygame.init()
 
@@ -38,13 +39,16 @@ button_scale = 1.0
 hovered_button = None
 background_x = 0
 
+
 def check_button_hover(pos, button_pos, button_image):
     if (button_pos[0] <= pos[0] <= button_pos[0] + button_image.get_width() and
             button_pos[1] <= pos[1] <= button_pos[1] + button_image.get_height()):
         return True
     return False
 
-while True:
+
+a = True
+while a:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -67,6 +71,12 @@ while True:
                 hovered_button = "exit"
             else:
                 hovered_button = None
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = event.pos
+            if check_button_hover(mouse_pos, button_raid_pos, button_raid_image):
+                carta = [['v', 'b', 'e', 'ar', 'v', 'v', 'b', 'e'], ['v', 'b', 'e', 'as', 'm', 't1', 'b', 'e'], ['t3']]
+                print(main_game(carta))
+                a = False
 
     background_x -= 2
     if background_x < -background_image.get_width():
@@ -117,4 +127,7 @@ while True:
     else:
         screen.blit(button_exit_image, button_exit_pos)
 
-    pygame.display.flip()
+    if a:
+        pygame.display.flip()
+
+
