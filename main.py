@@ -4,8 +4,8 @@ import sys
 from classes import (Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle, score, Box, Item, boxes,
                      Medkit, Ammo_box, Text)
 
-WIDTH = 1000
-HEIGHT = 800
+WIDTH = 1920
+HEIGHT = 1080
 FPS = 60
 
 # Задаем цвета
@@ -26,23 +26,27 @@ clock = pygame.time.Clock()
 
 
 def show_stats(player, screen1):
-    font1 = pygame.font.Font(None, 100)
+    font1 = pygame.font.Font(None, 120)
     font2 = pygame.font.Font(None, 50)
-    cur_ammo = font1.render(str(player.gun.current_ammo), True, (0, 0, 0))
-    reload_num = font2.render(str(round(player.gun.reload / 60, 1)), True, (0, 0, 0))
-    total_ammo = font1.render(str(player.gun.total_ammo), True, (0, 0, 0))
-    hp = font1.render(str(player.hit_points), True, (0, 0, 0))
-    medkits = font1.render(str(player.medkits), True, (0, 0, 0))
+    med_font  = pygame.font.Font(None, 125)
+    cur_ammo = font1.render(str(player.gun.current_ammo), True, (160, 0, 0))
+    reload_num = font2.render(str(round(player.gun.reload / 60, 1)), True, (160, 0, 0))
+    total_ammo = font1.render(str(player.gun.total_ammo), True, (160, 0, 0))
+    hp = font1.render(str(player.hit_points), True, (160, 0, 0))
+    medkits = med_font.render(str(player.medkits), True, (160, 0, 0))
     text_x = player.rect.x + 390
     text_y = player.rect.y + 310
     text_w = cur_ammo.get_width()
     text_h = cur_ammo.get_height()
-    screen1.blit(hp, (player.rect.x - 450, player.rect.y + 350))
-    screen1.blit(cur_ammo, (text_x, text_y))
-    screen1.blit(total_ammo, (text_x, text_y + 60))
-    screen1.blit(medkits, (text_x - 670, text_y + 40))
+    screen1.blit(HP_image, (50, HEIGHT - 150))
+    screen1.blit(cur_ammo, (text_x + 100, text_y + 100))
+    screen1.blit(total_ammo, (text_x + 100, text_y + 160))
+    screen1.blit(medkits, (210, HEIGHT - 125))
     if player.gun.reload / 60 > 0.4:
         screen1.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
+    for i in range (player.hit_points // 5):
+        image1 = pygame.transform.scale(HP_piece_img, (20, 40))
+        screen1.blit(image1, (100 + (i // 20) * 32, i % 20 * 40 + 75))
 
 
 class Marker(pygame.sprite.Sprite):
@@ -79,9 +83,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
-        self.guns = [Shotgun(2, self, shotgun_image), Assault_rifle(3, self, shotgun_image)]
+        self.guns = [Shotgun(2, self, shotgun_image, 0), Assault_rifle(3, self, rifle_image, 1)]
         all_sprites.add(self.guns[0], self.guns[1])
         self.gun = self.guns[0]
+        self.gun_num = 0
         self.hit_points = 100
         self.medkits = 0
         self.change_sprite = 30
@@ -148,6 +153,7 @@ class Player(pygame.sprite.Sprite):
 
     def change_weapon(self, num):
         self.gun = self.guns[num]
+        self.gun_num = num
 
     def shoot(self, x, y):
         speedx = 10
@@ -214,7 +220,7 @@ class Camera:
 def main_game(map):
     pygame.init()
     pygame.mixer.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
     global score
     running = True
     for i in range(len(map)):
@@ -224,7 +230,7 @@ def main_game(map):
                 all_sprites.add(m)
                 boxes.add(m)
             elif map[i][j][0] == 'e':
-                c = Enemy(j * 100, i * 100, player)
+                c = Enemy(j * 100, i * 100, player, borsh_images)
                 all_sprites.add(c)
                 enemys.add(c)
             elif map[i][j] == 'm':
@@ -278,9 +284,6 @@ def main_game(map):
         for sprite in all_sprites:
             camera.apply(sprite)
 
-        # Обновление
-
-        # Рендеринг
         screen.fill(BLACK)
 
         all_sprites.draw(screen)
@@ -298,7 +301,14 @@ medkit_image = pygame.image.load('Images/medkit.png').convert_alpha()
 shotgun_ammo = pygame.image.load('Images/shotgun_ammo.png').convert_alpha()
 rifle_ammo = pygame.image.load('Images/ammo_rifle.png').convert_alpha()
 shotgun_image = pygame.image.load('Images/shotgun_defolt.png').convert_alpha()
+rifle_image = pygame.image.load('Images/rifle.png').convert_alpha()
 text_image = pygame.image.load('Images/disckette.png').convert_alpha()
+HP_image = pygame.image.load('Images/HP_menu.png').convert_alpha()
+HP_piece_img = pygame.image.load('Images/HP_piece.png').convert_alpha()
+borsh_1 = pygame.image.load('Images/борщевик1.png').convert_alpha()
+borsh_2 = pygame.image.load('Images/борщевик2.png').convert_alpha()
+borsh_3 = pygame.image.load('Images/борщевик3.png').convert_alpha()
+borsh_images = [borsh_1, borsh_2, borsh_3]
 player = Player()
 mark = Marker()
 all_sprites.add(mark)

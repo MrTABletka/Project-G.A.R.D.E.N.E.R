@@ -2,8 +2,8 @@ import pygame
 import random
 import sys
 
-WIDTH = 1000
-HEIGHT = 800
+WIDTH = 1920
+HEIGHT = 1080
 FPS = 60
 
 # Задаем цвета
@@ -45,31 +45,33 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, pl):
+    def __init__(self, x, y, pl, images):
         pygame.sprite.Sprite.__init__(self)
-        self.hit_points = 4
-        self.image = pygame.Surface((30, 40))
-        color = random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 255)
-        self.image.fill(color)
+        self.image = images[0]
         self.rect = self.image.get_rect()
+        self.hit_points = 4
         self.rect.x = x
         self.rect.y = y
         self.player = pl
         self.reload = 30
+        self.change_sprite = 25
+        self.images = images
+        self.image_num = 0
 
     def update(self):
         x = 0
         y = 0
-        if self.rect.x > 468:
+        self.change_sprite -= 1
+        if self.rect.x > WIDTH / 2:
             self.rect.x -= 1
             x = -1
-        if self.rect.x <= 468:
+        if self.rect.x <= WIDTH / 2:
             self.rect.x += 1
             x = 1
-        if self.rect.y >= 352:
+        if self.rect.y >= HEIGHT / 2:
             self.rect.y -= 1
             y = -1
-        if self.rect.y <= 352:
+        if self.rect.y <= HEIGHT / 2:
             self.rect.y += 1
             y = 1
 
@@ -97,13 +99,25 @@ class Enemy(pygame.sprite.Sprite):
         if self.hit_points <= 0:
             self.kill()
             increase_score(10)
+        if self.change_sprite <= 0:
+            if self.image_num == 0:
+                self.image = self.images[1]
+                self.image_num = 1
+            elif self.image_num == 1:
+                self.image = self.images[2]
+                self.image_num = 2
+            elif self.image_num == 2:
+                self.image = self.images[0]
+                self.image_num = 0
+            self.change_sprite = 25
 
 
 class Gun(pygame.sprite.Sprite):
-    def __init__(self, damage, pl, image):
+    def __init__(self, damage, pl, image, num):
         pygame.sprite.Sprite.__init__(self)
         self.hit_points = 4
         self.image = image
+        self.image_saved = image
         self.rect = self.image.get_rect()
         self.player = pl
         self.rect.x = self.player.rect.x
@@ -114,7 +128,9 @@ class Gun(pygame.sprite.Sprite):
         self.total_ammo = 28
         self.fire_rate = 20
         self.reload = 0
-
+        self.num = num
+        self.x_y = (self.rect.width, self.rect.height)
+         
     def shoot(self, x, y, sp_x, sp_y):
         if self.current_ammo != 0:
             self.current_ammo -= 1
@@ -122,9 +138,7 @@ class Gun(pygame.sprite.Sprite):
             all_sprites.add(bullet)
             bullets.add(bullet)
             self.reload = self.fire_rate
-        else:
-            self.reload_ammo()
-        self.kill()
+
 
     def reload_ammo(self):
         if self.total_ammo != 0:
@@ -135,6 +149,12 @@ class Gun(pygame.sprite.Sprite):
     def update(self):
         self.rect.x = self.player.rect.x + 12
         self.rect.y = self.player.rect.y + 48
+        if self.current_ammo == 0:
+            self.reload_ammo()
+        if self.player.gun_num != self.num:
+            self.image = pygame.transform.scale(self.image_saved, (0, 0))
+        else:
+            self.image = pygame.transform.scale(self.image_saved, self.x_y)
 
 
 class Shotgun(Gun):
@@ -181,15 +201,8 @@ class Shotgun(Gun):
 
 
 class Assault_rifle(Gun):
-    def __init__(self, damage, pl, image):
-        pygame.sprite.Sprite.__init__(self)
-        self.hit_points = 4
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.player = pl
-        self.rect.x = self.player.rect.x
-        self.rect.y = self.player.rect.y + 40
-        self.damage = damage
+    def __init__(self, damage, pl, image, num):
+        super().__init__( damage, pl, image, num)
         self.ammo_max = 30
         self.current_ammo = 30
         self.total_ammo = 120

@@ -74,7 +74,7 @@ while a:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = event.pos
             if check_button_hover(mouse_pos, button_raid_pos, button_raid_image):
-                carta = [['v', 'b', 'e', 'ar', 'v', 'v', 'b', 'e'], ['v', 'b', 'e', 'as', 'm', 't1', 'b', 'e'], ['t3']]
+                carta = [['v', 'b', 'e', 'ar', 'v', 'v', 'b', 'e'], ['v', 'b', 'e', 'as', 'm', 't1', 'b', 'e'], ['t3',  'm', 'm', 'm', 'm', 'm']]
                 print(main_game(carta))
                 a = False
 
