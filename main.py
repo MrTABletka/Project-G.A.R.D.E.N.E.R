@@ -39,14 +39,18 @@ def show_stats(player, screen1):
     text_w = cur_ammo.get_width()
     text_h = cur_ammo.get_height()
     screen1.blit(HP_image, (50, HEIGHT - 150))
-    screen1.blit(cur_ammo, (text_x + 100, text_y + 100))
-    screen1.blit(total_ammo, (text_x + 100, text_y + 160))
+    screen1.blit(cur_ammo, (WIDTH - 140, text_y + 100))
+    screen1.blit(total_ammo, (WIDTH - 140, text_y + 160))
     screen1.blit(medkits, (210, HEIGHT - 125))
     if player.gun.reload / 60 > 0.4:
         screen1.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
     for i in range (player.hit_points // 5):
         image1 = pygame.transform.scale(HP_piece_img, (20, 40))
         screen1.blit(image1, (100 + (i // 20) * 32, i % 20 * 40 + 75))
+    if player.gun_num == 0:
+        screen1.blit(pygame.transform.scale(guns_menu_images[0], (224, 72)), (WIDTH - 500, HEIGHT - 150))
+    else:
+        screen1.blit(pygame.transform.scale(guns_menu_images[1], (200, 96)), (WIDTH - 500, HEIGHT - 150))
 
 
 class Marker(pygame.sprite.Sprite):
@@ -98,24 +102,27 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.speedx = 0
         self.speedy = 0
+        multiplier = 1
         keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LSHIFT]:
+            multiplier = 1.5
         if keystate[pygame.K_a]:
-            self.speedx = -3
+            self.speedx = -3 * multiplier
             self.left = True
-            self.change_sprite -= 1
+            self.change_sprite -= 1 * multiplier
             self.moved = True
         if keystate[pygame.K_d]:
-            self.speedx = 3
+            self.speedx = 3 * multiplier
             self.left = False
-            self.change_sprite -= 1
+            self.change_sprite -= 1 * multiplier
             self.moved = True
         if keystate[pygame.K_w]:
-            self.speedy = -3
-            self.change_sprite -= 1
+            self.speedy = -3 * multiplier
+            self.change_sprite -= 1 * multiplier
             self.moved = True
         if keystate[pygame.K_s]:
-            self.speedy = 3
-            self.change_sprite -= 1
+            self.speedy = 3 * multiplier
+            self.change_sprite -= 1 * multiplier
             self.moved = True
         self.rect.x += self.speedx
         self.rect.y += self.speedy
@@ -308,6 +315,7 @@ HP_piece_img = pygame.image.load('Images/HP_piece.png').convert_alpha()
 borsh_1 = pygame.image.load('Images/борщевик1.png').convert_alpha()
 borsh_2 = pygame.image.load('Images/борщевик2.png').convert_alpha()
 borsh_3 = pygame.image.load('Images/борщевик3.png').convert_alpha()
+guns_menu_images = [pygame.image.load('Images/shotgun_menu.png').convert_alpha(), pygame.image.load('Images/rifle_menu.png').convert_alpha()]
 borsh_images = [borsh_1, borsh_2, borsh_3]
 player = Player()
 mark = Marker()
