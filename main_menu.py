@@ -74,7 +74,21 @@ while a:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = event.pos
             if check_button_hover(mouse_pos, button_raid_pos, button_raid_image):
-                carta = [['v', 'b', 'e', 'ar', 'v', 'v', 'b', 'e'], ['v', 'b', 'e', 'as', 'm', 't1', 'b', 'e'], ['t3',  'm', 'm', 'm', 'm', 'm']]
+                carta = [['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
+                         ['b', 'as', 'm', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'ar', 'b'],
+                         ['b',  'v', 'e', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'e', 'b'],
+                         ['b',  'ar', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'e', 'v', 't4', 'v', 'e', 'v', 'v', 'v', 'b'],
+                         ['b',  'b', 'b', 'b', 'b', 't1', 'v', 'v', 'v', 'v', 'b', 'v', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'v', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'f', 'v', 'v', 'v', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'b'],
+                         ['b', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b'],
+                         ['b', 'ar', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'b', 'b', 'v', 'v', 'b', 'b', 'b', 'b', 'b'],
+                         ['b', 'v', 'as', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'e', 'v', 'v', 'v', 'b', 'v', 'v', 't3', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'b', 'b', 'b', 'v', 'v', 'v', 'b'],
+                         ['b', 'e', 'v', 'v', 'v', 'b', 'v', 't2', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'as', 'e', 'b'],
+                         ['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b']
+                         ]
                 print(main_game(carta))
                 a = False
 

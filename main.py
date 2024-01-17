@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 from classes import (Enemy, Bullet, Gun, all_sprites, bullets, enemys, Shotgun, Assault_rifle, score, Box, Item, boxes,
-                     Medkit, Ammo_box, Text)
+                     Medkit, Ammo_box, Text, Signal_fire, fires)
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -10,7 +10,7 @@ FPS = 60
 
 # Задаем цвета
 WHITE = (255, 255, 255)
-BLACK = (100, 100, 75)
+BLACK = (115, 135, 115)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
@@ -98,31 +98,32 @@ class Player(pygame.sprite.Sprite):
         self.left = False
         self.moved = False
         self.collected = []
+        self.multiplier = 1
 
     def update(self):
+        self.multiplier = 1
         self.speedx = 0
         self.speedy = 0
-        multiplier = 1
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LSHIFT]:
-            multiplier = 1.5
+            self.multiplier = 2
         if keystate[pygame.K_a]:
-            self.speedx = -3 * multiplier
+            self.speedx = -2 * self.multiplier
             self.left = True
-            self.change_sprite -= 1 * multiplier
+            self.change_sprite -= 1 * self.multiplier
             self.moved = True
         if keystate[pygame.K_d]:
-            self.speedx = 3 * multiplier
+            self.speedx = 2 * self.multiplier
             self.left = False
-            self.change_sprite -= 1 * multiplier
+            self.change_sprite -= 1 * self.multiplier
             self.moved = True
         if keystate[pygame.K_w]:
-            self.speedy = -3 * multiplier
-            self.change_sprite -= 1 * multiplier
+            self.speedy = -2 * self.multiplier
+            self.change_sprite -= 1 * self.multiplier
             self.moved = True
         if keystate[pygame.K_s]:
-            self.speedy = 3 * multiplier
-            self.change_sprite -= 1 * multiplier
+            self.speedy = 2 * self.multiplier
+            self.change_sprite -= 1 * self.multiplier
             self.moved = True
         self.rect.x += self.speedx
         self.rect.y += self.speedy
@@ -230,6 +231,7 @@ def main_game(map):
     screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
     global score
     running = True
+    encoords = []
     for i in range(len(map)):
         for j in range(len(map[i])):
             if map[i][j] == 'b':
@@ -237,9 +239,7 @@ def main_game(map):
                 all_sprites.add(m)
                 boxes.add(m)
             elif map[i][j][0] == 'e':
-                c = Enemy(j * 100, i * 100, player, borsh_images)
-                all_sprites.add(c)
-                enemys.add(c)
+                encoords.append((j * 100, i * 100))
             elif map[i][j] == 'm':
                 c = Medkit(j * 100, i * 100, medkit_image, player)
                 all_sprites.add(c)
@@ -253,6 +253,18 @@ def main_game(map):
             elif map[i][j][0] == 't':
                 c = Text(j * 100, i * 100, text_image, player, map[i][j][1])
                 all_sprites.add(c)
+            elif map[i][j] == 'f':
+                c = Signal_fire(j * 100, i * 100, fire_im[0], fire_im[1], player)
+                fires.add(c)
+                all_sprites.add(c)
+    for i in encoords:
+        c = Enemy(i[0], i[1], player, borsh_images)
+        all_sprites.add(c)
+        enemys.add(c)
+
+    pygame.mixer.music.load('music/music2.mp3')
+    pygame.mixer.music.set_volume(0.05)
+    pygame.mixer.music.play(loops=-1)
 
     while running:
         # Держим цикл на правильной скорости
@@ -286,6 +298,12 @@ def main_game(map):
                     if player.medkits > 0:
                         player.hit_points += 20
                         player.medkits -= 1
+                if event.key == pygame.K_e:
+                    for i in fires:
+                        if pygame.sprite.collide_rect(i, player):
+                            running = False
+                            return [score[0] + 50, player.collected]
+
         all_sprites.update()
         camera.update()
         for sprite in all_sprites:
@@ -315,7 +333,10 @@ HP_piece_img = pygame.image.load('Images/HP_piece.png').convert_alpha()
 borsh_1 = pygame.image.load('Images/борщевик1.png').convert_alpha()
 borsh_2 = pygame.image.load('Images/борщевик2.png').convert_alpha()
 borsh_3 = pygame.image.load('Images/борщевик3.png').convert_alpha()
-guns_menu_images = [pygame.image.load('Images/shotgun_menu.png').convert_alpha(), pygame.image.load('Images/rifle_menu.png').convert_alpha()]
+fire_im = [pygame.image.load('Images/signal_fire.png').convert_alpha(),
+                    pygame.image.load('Images/signal_fire2.png').convert_alpha()]
+guns_menu_images = [pygame.image.load('Images/shotgun_menu.png').convert_alpha(),
+                    pygame.image.load('Images/rifle_menu.png').convert_alpha()]
 borsh_images = [borsh_1, borsh_2, borsh_3]
 player = Player()
 mark = Marker()

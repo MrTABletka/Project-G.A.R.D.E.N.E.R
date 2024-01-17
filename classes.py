@@ -39,6 +39,8 @@ class Bullet(pygame.sprite.Sprite):
         # убить, если он заходит за верхнюю часть экрана
         if self.rect.bottom < 0 or self.rect.top > HEIGHT or self.rect.left > WIDTH or self.rect.right < 0:
             self.kill()
+        if pygame.sprite.spritecollideany(self, boxes):
+            self.kill()
 
     def get_damage(self):
         return self.damage
@@ -49,7 +51,7 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = images[0]
         self.rect = self.image.get_rect()
-        self.hit_points = 4
+        self.hit_points = 8
         self.rect.x = x
         self.rect.y = y
         self.player = pl
@@ -62,18 +64,19 @@ class Enemy(pygame.sprite.Sprite):
         x = 0
         y = 0
         self.change_sprite -= 1
-        if self.rect.x > WIDTH / 2:
-            self.rect.x -= 1
-            x = -1
-        if self.rect.x <= WIDTH / 2:
-            self.rect.x += 1
-            x = 1
-        if self.rect.y >= HEIGHT / 2:
-            self.rect.y -= 1
-            y = -1
-        if self.rect.y <= HEIGHT / 2:
-            self.rect.y += 1
-            y = 1
+        if abs(self.rect.x - self.player.rect.x) < 500 and abs(self.rect.y - self.player.rect.y) < 500:
+            if self.rect.x > WIDTH / 2:
+                self.rect.x -= 1
+                x = -1
+            if self.rect.x <= WIDTH / 2:
+                self.rect.x += 1
+                x = 1
+            if self.rect.y >= HEIGHT / 2:
+                self.rect.y -= 1
+                y = -1
+            if self.rect.y <= HEIGHT / 2:
+                self.rect.y += 1
+                y = 1
 
         for e in enemys:
             if len(enemys) == 1:
@@ -120,8 +123,7 @@ class Gun(pygame.sprite.Sprite):
         self.image_saved = image
         self.rect = self.image.get_rect()
         self.player = pl
-        self.rect.x = self.player.rect.x
-        self.rect.y = self.player.rect.y + 48
+        self.rect.center = self.player.rect.center
         self.damage = damage
         self.current_ammo = 7
         self.ammo_max = 7
@@ -130,10 +132,34 @@ class Gun(pygame.sprite.Sprite):
         self.reload = 0
         self.num = num
         self.x_y = (self.rect.width, self.rect.height)
+        self.rotation = 0
+        self.swap = False
+        self.x_y_plus = [0, 0]
          
     def shoot(self, x, y, sp_x, sp_y):
+        self.x_y_plus = [0, 0]
         if self.current_ammo != 0:
             self.current_ammo -= 1
+            if sp_y > 0:
+                self.rotation = -45
+            elif sp_y < 0 :
+                self.rotation = 45
+            else:
+                self.rotation = 0
+                self.x_y_plus[1] = 10
+            if sp_x < 0:
+                self.swap = True
+                self.rotation = - self.rotation
+            elif sp_x > 0:
+                self.swap = False
+            else:
+                self.rotation = 90
+                self.x_y_plus[0] = 15
+                if sp_y < 0:
+                    self.swap = False
+                else:
+                    self.swap = True
+
             bullet = Bullet(x, y, sp_x, sp_y, self.damage)
             all_sprites.add(bullet)
             bullets.add(bullet)
@@ -147,20 +173,49 @@ class Gun(pygame.sprite.Sprite):
             self.total_ammo -= self.ammo_max
 
     def update(self):
-        self.rect.x = self.player.rect.x + 12
-        self.rect.y = self.player.rect.y + 48
         if self.current_ammo == 0:
             self.reload_ammo()
         if self.player.gun_num != self.num:
-            self.image = pygame.transform.scale(self.image_saved, (0, 0))
+            cur_image = pygame.transform.scale(self.image_saved, (0, 0))
         else:
-            self.image = pygame.transform.scale(self.image_saved, self.x_y)
+            cur_image = pygame.transform.scale(self.image_saved, self.x_y)
+        if self.swap:
+            cur_image = pygame.transform.flip(cur_image, True, False)
+        if self.player.left:
+            self.rect.midleft = self.player.rect.midleft
+        else:
+            self.rect.midright = self.player.rect.midright
+        self.rect.x += self.x_y_plus[0]
+        self.rect.y += self.x_y_plus[1]
+
+        self.image = pygame.transform.rotate(cur_image, self.rotation)
+
 
 
 class Shotgun(Gun):
     def shoot(self, x, y, sp_x, sp_y):
+        self.x_y_plus = [0, 0]
         if self.current_ammo != 0:
             self.current_ammo -= 1
+            if sp_y > 0:
+                self.rotation = -45
+            elif sp_y < 0:
+                self.rotation = 45
+            else:
+                self.rotation = 0
+                self.x_y_plus[1] = 10
+            if sp_x < 0:
+                self.swap = True
+                self.rotation = - self.rotation
+            elif sp_x > 0:
+                self.swap = False
+            else:
+                self.rotation = 90
+                self.x_y_plus[0] = 15
+                if sp_y < 0:
+                    self.swap = False
+                else:
+                    self.swap = True
             bullet1 = Bullet(x, y, sp_x, sp_y, self.damage)
             all_sprites.add(bullet1)
             sp_x_2 = sp_x
@@ -224,16 +279,16 @@ class Box(pygame.sprite.Sprite):
         if pygame.sprite.collide_rect(self, self.player):
             if self.player.speedx != 0:
                 if self.player.speedx < 0:
-                    self.player.rect.x += 3
-
+                    self.player.rect.x += 2 * self.player.multiplier
                 if self.player.speedx > 0:
-                    self.player.rect.x -= 3
+                    self.player.rect.x -= (2 * self.player.multiplier)
             if self.player.speedy != 0:
                 if self.player.speedy < 0:
-                    self.player.rect.y += 3
+                    self.player.rect.y += 2 * self.player.multiplier
 
                 if self.player.speedy > 0:
-                    self.player.rect.y -= 3
+                    self.player.rect.y -= (2 * self.player.multiplier)
+
 
         if self.hit_points <= 0:
             self.kill()
@@ -281,10 +336,41 @@ class Text(Item):
             self.player.collected.append(self.num)
             self.kill()
 
+class Signal_fire(Item):
+    def __init__(self, x, y, image1, image2, pl):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image1
+        self.image1 = image1
+        self.image2 = image2
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.player = pl
+        self.chande_sprite = 30
+        self.im_num = 0
+        self.hiden = True
+
+    def update(self):
+        if self.chande_sprite == 0:
+            if self.im_num == 0:
+                self.image = self.image2
+                self.im_num = 1
+            else:
+                self.image = self.image1
+                self.im_num = 0
+            if self.hiden:
+                self.image = pygame.transform.scale(self.image, (0, 0))
+            self.chande_sprite = 30
+        else:
+            self.chande_sprite -= 1
+        if len(enemys) == 0:
+            self.hiden = False
+
 
 
 score = [0]
 all_sprites = pygame.sprite.Group()
+fires = pygame.sprite.Group()
 enemys = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 boxes = pygame.sprite.Group()
