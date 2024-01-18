@@ -135,14 +135,14 @@ class Gun(pygame.sprite.Sprite):
         self.rotation = 0
         self.swap = False
         self.x_y_plus = [0, 10]
-         
+
     def shoot(self, x, y, sp_x, sp_y):
         self.x_y_plus = [0, 0]
         if self.current_ammo != 0:
             self.current_ammo -= 1
             if sp_y > 0:
                 self.rotation = -45
-            elif sp_y < 0 :
+            elif sp_y < 0:
                 self.rotation = 45
             else:
                 self.rotation = 0
@@ -164,7 +164,6 @@ class Gun(pygame.sprite.Sprite):
             all_sprites.add(bullet)
             bullets.add(bullet)
             self.reload = self.fire_rate
-
 
     def reload_ammo(self):
         if self.total_ammo != 0:
@@ -189,7 +188,6 @@ class Gun(pygame.sprite.Sprite):
         self.rect.y += self.x_y_plus[1]
 
         self.image = pygame.transform.rotate(cur_image, self.rotation)
-
 
 
 class Shotgun(Gun):
@@ -257,7 +255,7 @@ class Shotgun(Gun):
 
 class Assault_rifle(Gun):
     def __init__(self, damage, pl, image, num):
-        super().__init__( damage, pl, image, num)
+        super().__init__(damage, pl, image, num)
         self.ammo_max = 30
         self.current_ammo = 30
         self.total_ammo = 30
@@ -288,7 +286,6 @@ class Box(pygame.sprite.Sprite):
 
                 if self.player.speedy > 0:
                     self.player.rect.y -= (2 * self.player.multiplier)
-
 
         if self.hit_points <= 0:
             self.kill()
@@ -331,10 +328,13 @@ class Text(Item):
     def __init__(self, x, y, image, pl, type):
         super().__init__(x, y, image, pl)
         self.num = int(type)
+
     def update(self):
         if pygame.sprite.collide_rect(self, self.player):
             self.player.collected.append(self.num)
+            increase_score(10)
             self.kill()
+
 
 class Signal_fire(Item):
     def __init__(self, x, y, image1, image2, pl):
@@ -365,7 +365,6 @@ class Signal_fire(Item):
             self.chande_sprite -= 1
         if len(enemys) == 0:
             self.hiden = False
-
 
 
 score = [0]

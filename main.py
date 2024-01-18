@@ -16,7 +16,6 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
-
 # Создаем игру и окно
 pygame.init()
 pygame.mixer.init()
@@ -28,7 +27,7 @@ clock = pygame.time.Clock()
 def show_stats(player, screen1):
     font1 = pygame.font.Font(None, 120)
     font2 = pygame.font.Font(None, 50)
-    med_font  = pygame.font.Font(None, 125)
+    med_font = pygame.font.Font(None, 125)
     cur_ammo = font1.render(str(player.gun.current_ammo), True, (160, 0, 0))
     reload_num = font2.render(str(round(player.gun.reload / 60, 1)), True, (160, 0, 0))
     total_ammo = font1.render(str(player.gun.total_ammo), True, (160, 0, 0))
@@ -43,8 +42,8 @@ def show_stats(player, screen1):
     screen1.blit(total_ammo, (WIDTH - 140, text_y + 160))
     screen1.blit(medkits, (210, HEIGHT - 125))
     if player.gun.reload / 60 > 0.4:
-        screen1.blit(reload_num, (player.rect.x + 10,  player.rect.y + 100))
-    for i in range (player.hit_points // 5):
+        screen1.blit(reload_num, (player.rect.x + 10, player.rect.y + 100))
+    for i in range(player.hit_points // 5):
         image1 = pygame.transform.scale(HP_piece_img, (20, 40))
         screen1.blit(image1, (100 + (i // 20) * 32, i % 20 * 40 + 75))
     if player.gun_num == 0:
@@ -56,7 +55,7 @@ def show_stats(player, screen1):
 class Marker(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((0,0))
+        self.image = pygame.Surface((0, 0))
         self.image.fill((100, 200, 100))
         self.rect = self.image.get_rect()
         self.rect.x = 0
@@ -235,7 +234,7 @@ def main_game(map):
     for i in range(len(map)):
         for j in range(len(map[i])):
             if map[i][j] == 'b':
-                m = Box(j * 100, i * 100,box_image, player)
+                m = Box(j * 100, i * 100, box_image, player)
                 all_sprites.add(m)
                 boxes.add(m)
             elif map[i][j][0] == 'e':
@@ -334,7 +333,7 @@ borsh_1 = pygame.image.load('Images/борщевик1.png').convert_alpha()
 borsh_2 = pygame.image.load('Images/борщевик2.png').convert_alpha()
 borsh_3 = pygame.image.load('Images/борщевик3.png').convert_alpha()
 fire_im = [pygame.image.load('Images/signal_fire.png').convert_alpha(),
-                    pygame.image.load('Images/signal_fire2.png').convert_alpha()]
+           pygame.image.load('Images/signal_fire2.png').convert_alpha()]
 guns_menu_images = [pygame.image.load('Images/shotgun_menu.png').convert_alpha(),
                     pygame.image.load('Images/rifle_menu.png').convert_alpha()]
 borsh_images = [borsh_1, borsh_2, borsh_3]
