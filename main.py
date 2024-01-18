@@ -53,23 +53,24 @@ def show_stats(player, screen1):
 
 
 class Marker(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, pl):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((0, 0))
         self.image.fill((100, 200, 100))
         self.rect = self.image.get_rect()
         self.rect.x = 0
         self.rect.y = 0
+        self.pl = pl
 
     def update(self):
         if self.rect.x > WIDTH:
-            player.rect.x += 5
+            self.pl.rect.x += 5
         elif self.rect.x < - WIDTH:
-            player.rect.x -= 5
+            self.pl.rect.x -= 5
         if self.rect.y > HEIGHT:
-            player.rect.y += 5
+            self.pl.rect.y += 5
         elif self.rect.y < - HEIGHT:
-            player.rect.y -= 5
+            self.pl.rect.y -= 5
 
 
 class Player(pygame.sprite.Sprite):
@@ -209,9 +210,10 @@ class Player(pygame.sprite.Sprite):
 
 class Camera:
     # зададим начальный сдвиг камеры
-    def __init__(self):
+    def __init__(self, pl):
         self.dx = 0
         self.dy = 0
+        self.pl = pl
 
     # сдвинуть объект obj на смещение камеры
     def apply(self, obj):
@@ -220,8 +222,8 @@ class Camera:
 
     # позиционировать камеру на объекте target
     def update(self):
-        self.dx = -(player.rect.x + 32 - WIDTH // 2)
-        self.dy = -(player.rect.y + 48 - HEIGHT // 2)
+        self.dx = -(self.pl.rect.x + 32 - WIDTH // 2)
+        self.dy = -(self.pl.rect.y + 48 - HEIGHT // 2)
 
 
 def main_game(map):
@@ -231,6 +233,10 @@ def main_game(map):
     global score
     running = True
     encoords = []
+    player = Player()
+    mark = Marker(player)
+    all_sprites.add(mark)
+    camera = Camera(player)
     for i in range(len(map)):
         for j in range(len(map[i])):
             if map[i][j] == 'b':
@@ -275,11 +281,17 @@ def main_game(map):
 
         if player.hit_points <= 0:
             running = False
+            for e in all_sprites:
+                e.kill()
             return [score[0], player.collected]
+
         for event in pygame.event.get():
             # проверка для закрытия окна
             if event.type == pygame.QUIT:
                 running = False
+                for e in all_sprites:
+                    e.kill()
+                pygame.quit()
                 return [score[0], player.collected]
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -301,6 +313,8 @@ def main_game(map):
                     for i in fires:
                         if pygame.sprite.collide_rect(i, player):
                             running = False
+                            for e in all_sprites:
+                                e.kill()
                             return [score[0] + 50, player.collected]
 
         all_sprites.update()
@@ -316,7 +330,7 @@ def main_game(map):
         pygame.display.flip()
 
 
-camera = Camera()
+
 box_image = pygame.image.load('Images/box.png').convert_alpha()
 player_image = pygame.image.load('Images/player_stand.png').convert_alpha()
 player_run1 = pygame.image.load('Images/player_run1.png').convert_alpha()
@@ -337,8 +351,6 @@ fire_im = [pygame.image.load('Images/signal_fire.png').convert_alpha(),
 guns_menu_images = [pygame.image.load('Images/shotgun_menu.png').convert_alpha(),
                     pygame.image.load('Images/rifle_menu.png').convert_alpha()]
 borsh_images = [borsh_1, borsh_2, borsh_3]
-player = Player()
-mark = Marker()
-all_sprites.add(mark)
+
 
 pygame.quit()
