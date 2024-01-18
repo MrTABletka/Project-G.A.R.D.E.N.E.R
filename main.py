@@ -262,8 +262,8 @@ def main_game(map):
         all_sprites.add(c)
         enemys.add(c)
 
-    pygame.mixer.music.load('music/music2.mp3')
-    pygame.mixer.music.set_volume(0.05)
+    pygame.mixer.music.load('music/Soundtrack2.mp3')
+    pygame.mixer.music.set_volume(0.025)
     pygame.mixer.music.play(loops=-1)
 
     while running:

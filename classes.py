@@ -134,7 +134,7 @@ class Gun(pygame.sprite.Sprite):
         self.x_y = (self.rect.width, self.rect.height)
         self.rotation = 0
         self.swap = False
-        self.x_y_plus = [0, 0]
+        self.x_y_plus = [0, 10]
          
     def shoot(self, x, y, sp_x, sp_y):
         self.x_y_plus = [0, 0]
@@ -260,7 +260,7 @@ class Assault_rifle(Gun):
         super().__init__( damage, pl, image, num)
         self.ammo_max = 30
         self.current_ammo = 30
-        self.total_ammo = 120
+        self.total_ammo = 30
         self.fire_rate = 6
         self.reload = 0
 

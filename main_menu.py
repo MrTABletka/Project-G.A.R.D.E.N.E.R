@@ -1,7 +1,7 @@
 import pygame
 import sys
 from main import main_game
-
+import random
 pygame.init()
 
 screen_width = 1024
@@ -74,23 +74,32 @@ while a:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = event.pos
             if check_button_hover(mouse_pos, button_raid_pos, button_raid_image):
-                carta = [['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
-                         ['b', 'as', 'm', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'ar', 'b'],
+                carta1 = [['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
+                         ['b', 'as', 'm', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'm', 'v', 'e', 'v', 'v', 'e', 'v', 'v', 'ar', 'b'],
                          ['b',  'v', 'e', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'e', 'b'],
-                         ['b',  'ar', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'e', 'v', 't4', 'v', 'e', 'v', 'v', 'v', 'b'],
-                         ['b',  'b', 'b', 'b', 'b', 't1', 'v', 'v', 'v', 'v', 'b', 'v', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'v', 'b'],
-                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'b'],
-                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'f', 'v', 'v', 'v', 'b'],
-                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'b'],
-                         ['b', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b'],
+                         ['b',  'ar', 'e', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'e', 'v', 't4', 'e', 'e', 'v', 'v', 'v', 'b'],
+                         ['b',  'b', 'b', 'b', 'b', 't1', 'v', 'v', 'v', 'v', 'b', 'v', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'ar', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'e', 'v', 'b'],
+                         ['b', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'f', 'v', 'v', 'e', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'e', 'v', 'v', 'v', 'as', 'b'],
+                         ['b', 'b', 'b', 'b', 'b', 'b', 'v', 'v', 'v', 'e', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b'],
                          ['b', 'ar', 'v', 'v', 'v', 'b', 'v', 'v', 'v', 'v', 'v', 'b', 'b', 'b', 'v', 'v', 'b', 'b', 'b', 'b', 'b'],
-                         ['b', 'v', 'as', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'e', 'v', 'v', 'v', 'b', 'v', 'v', 't3', 'b'],
-                         ['b', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'v', 'v', 'b', 'b', 'b', 'v', 'v', 'v', 'b'],
-                         ['b', 'e', 'v', 'v', 'v', 'b', 'v', 't2', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'as', 'e', 'b'],
+                         ['b', 'v', 'as', 'e', 'm', 'v', 'v', 'v', 'v', 'v', 'v', 'b', 'e', 'v', 'v', 'v', 'b', 'v', 'v', 't3', 'b'],
+                         ['b', 'v', 'v', 'v', 'v', 'e', 'v', 'v', 'v', 'v', 'e', 'b', 'm', 'v', 'b', 'b', 'b', 'v', 'm', 'e', 'b'],
+                         ['b', 'e', 'v', 'v', 'v', 'b', 'v', 't2', 'v', 'e', 'v', 'v', 'v', 'v', 'v', 'v', 'v', 'e', 'as', 'e', 'b'],
                          ['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b']
                          ]
-                print(main_game(carta))
-                a = False
+                carta2 = [['b', 'v', 'v', 'v', 'v', 'b', 'v', 'b', 'v', 'b', 'v',],
+                         ['b', 'as', 'ar', 'm', 't1', 'v', 'v', 'v', 'v', 'e', 'v' ],
+                         ['b', 'v', 'v', 'v', 'v', 'm', 'e', 'b', 'v', 'b', 'v'],
+                         ['b', 'v', 'f', 'v', 'v', 'm', 'e', 'v', 'v', 'v', 'v'],
+                         ]
+                if random.randrange(0, 2, step=1):
+                    print(main_game(carta1))
+                    a = False
+                else:
+                    print(main_game(carta2))
+                    a = False
 
     background_x -= 2
     if background_x < -background_image.get_width():
